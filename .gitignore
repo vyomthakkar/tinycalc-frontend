@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+
+# Rust specific
+/target/
+**/*.rs.bk
+Cargo.lock  # You may want to keep this for binary projects
+/pkg/       # WebAssembly package output directory
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

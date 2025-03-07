@@ -1,19 +1,10 @@
 use wasm_bindgen::prelude::*;
 
-/* Public API (to js) for the calculator
-    Input: A string representing a mathematical expression
-    Output: A f64 representing the result of the expression or an error message
+/* Core calculator logic that can be used both by wasm and for native testing
+   Input: A string representing a mathematical expression
+   Output: An i32 representing the result of the expression or an error message
 */
-#[wasm_bindgen]
-pub fn calculate(expression: &str) -> Result<i32, JsValue> {
-    match evaluate_expression(expression) {
-        Ok(result) => Ok(result),
-        Err(err) => Err(JsValue::from_str(&format!("Error: {}", err))),
-    }
-}
-
-
-fn evaluate_expression(expression: &str) -> Result<i32, String> {
+pub fn evaluate_expression(expression: &str) -> Result<i32, String> {
     let mut numbers: Vec<i32> = Vec::new(); //stack for numbers
     let mut operators: Vec<char> = Vec::new(); //stack for operators
     
@@ -86,7 +77,6 @@ fn evaluate_expression(expression: &str) -> Result<i32, String> {
     }
     
     Ok(numbers[0])
-
 }
 
 fn is_operator(c: char) -> bool {
@@ -100,7 +90,6 @@ fn precedence(op: &char) -> u8 {
         _ => 0,
     }
 }
-
 
 fn apply_operator(numbers: &mut Vec<i32>, operators: &mut Vec<char>) -> Result<(), String> {
     if numbers.len() < 2 {
@@ -126,4 +115,73 @@ fn apply_operator(numbers: &mut Vec<i32>, operators: &mut Vec<char>) -> Result<(
     
     numbers.push(result);
     Ok(())
+}
+
+/* Public API (to js) for the calculator
+    Input: A string representing a mathematical expression
+    Output: An i32 representing the result of the expression or an error message
+*/
+#[wasm_bindgen]
+pub fn calculate(expression: &str) -> Result<i32, JsValue> {
+    match evaluate_expression(expression) {
+        Ok(result) => Ok(result),
+        Err(err) => Err(JsValue::from_str(&format!("Error: {}", err))),
+    }
+}
+
+// Test module - only compiled when running tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_addition() {
+        assert_eq!(evaluate_expression("2 + 3").unwrap(), 5);
+        assert_eq!(evaluate_expression("10 + 20").unwrap(), 30);
+    }
+    
+    #[test]
+    fn test_subtraction() {
+        assert_eq!(evaluate_expression("5 - 3").unwrap(), 2);
+        assert_eq!(evaluate_expression("10 - 20").unwrap(), -10);
+    }
+    
+    #[test]
+    fn test_multiplication() {
+        assert_eq!(evaluate_expression("2 * 3").unwrap(), 6);
+        assert_eq!(evaluate_expression("10 * 20").unwrap(), 200);
+    }
+    
+    #[test]
+    fn test_division() {
+        assert_eq!(evaluate_expression("6 / 3").unwrap(), 2);
+        assert_eq!(evaluate_expression("5 / 2").unwrap(), 2); // Integer division
+    }
+    
+    #[test]
+    fn test_precedence() {
+        assert_eq!(evaluate_expression("2 + 3 * 4").unwrap(), 14);
+        assert_eq!(evaluate_expression("2 * 3 + 4").unwrap(), 10);
+    }
+    
+    #[test]
+    fn test_parentheses() {
+        assert_eq!(evaluate_expression("(2 + 3) * 4").unwrap(), 20);
+        assert_eq!(evaluate_expression("2 * (3 + 4)").unwrap(), 14);
+    }
+    
+    #[test]
+    fn test_division_by_zero() {
+        assert!(evaluate_expression("5 / 0").is_err());
+    }
+    
+    #[test]
+    fn test_invalid_characters() {
+        assert!(evaluate_expression("2 + a").is_err());
+    }
+    
+    #[test]
+    fn test_mismatched_parentheses() {
+        assert!(evaluate_expression("(2 + 3").is_err());
+    }
 }

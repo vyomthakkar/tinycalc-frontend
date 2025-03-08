@@ -65,7 +65,7 @@ const Calculator = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl shadow-2xl mt-6 border-2 border-gray-800">
+    <div className="max-w-lg mx-auto p-6 bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl shadow-2xl mt-6 border-2 border-gray-800">
       <h2 className="text-3xl font-mono font-bold text-white mb-6 text-center">
         <span className="text-indigo-400 drop-shadow-lg" style={{ textShadow: '0 0 12px rgba(129, 140, 248, 0.8)' }}>Calculator</span>
       </h2>
@@ -101,8 +101,8 @@ const Calculator = () => {
                   onKeyDown={handleKeyDown}
                   onFocus={() => setInputFocused(true)}
                   onBlur={() => setInputFocused(false)}
-                  placeholder="Enter an expression (e.g., 2+2, 3*(4+5))"
-                  className={`w-full bg-gray-900 text-white px-4 py-3 rounded font-mono border-2 transition-colors duration-200 outline-none text-right text-xl ${
+                  placeholder="Enter an expression"
+                  className={`w-full bg-gray-900 text-white px-4 py-3 rounded font-mono border-2 transition-colors duration-200 outline-none text-left text-lg ${
                     inputFocused ? 'border-indigo-500 shadow-lg shadow-indigo-500/20' : 'border-gray-700'
                   }`}
                 />
@@ -205,35 +205,35 @@ const Calculator = () => {
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
                 onClick={() => setExpression("2 + 3")}
               >
-                <div className="font-mono text-gray-400 text-sm">Addition</div>
+                <div className="font-mono text-gray-400 text-sm">Add</div>
                 <code className="text-white">2 + 3</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
                 onClick={() => setExpression("5 - 2")}
               >
-                <div className="font-mono text-gray-400 text-sm">Subtraction</div>
+                <div className="font-mono text-gray-400 text-sm">Subtract</div>
                 <code className="text-white">5 - 2</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
                 onClick={() => setExpression("4 * 3")}
               >
-                <div className="font-mono text-gray-400 text-sm">Multiplication</div>
+                <div className="font-mono text-gray-400 text-sm">Multiply</div>
                 <code className="text-white">4 * 3</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
                 onClick={() => setExpression("10 / 2")}
               >
-                <div className="font-mono text-gray-400 text-sm">Division</div>
+                <div className="font-mono text-gray-400 text-sm">Divide</div>
                 <code className="text-white">10 / 2</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer md:col-span-2 shadow-md hover:shadow-lg"
                 onClick={() => setExpression("(2 + 3) * 4")}
               >
-                <div className="font-mono text-gray-400 text-sm">Parentheses</div>
+                <div className="font-mono text-gray-400 text-sm">Parentheses / Composition</div>
                 <code className="text-white">(2 + 3) * 4</code>
               </div>
             </div>

@@ -12,15 +12,14 @@ dist
 dist-ssr
 *.local
 
-
 # Rust specific
 /target/
 **/*.rs.bk
 Cargo.lock  # You may want to keep this for binary projects
-/pkg/       # WebAssembly package output directory
+# /pkg/      # REMOVED - We need this for deployment
 
 # wasm-pack build output
-/pkg/
+# /pkg/      # REMOVED - We need this for deployment
 /target/
 /wasm-pack.log
 /Cargo.lock

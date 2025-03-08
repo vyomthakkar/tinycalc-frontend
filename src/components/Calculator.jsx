@@ -66,9 +66,9 @@ const Calculator = () => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl shadow-2xl mt-6 border-2 border-gray-800">
-      <h2 className="text-3xl font-mono font-bold text-white mb-6 text-center">
-        <span className="text-indigo-400 drop-shadow-lg" style={{ textShadow: '0 0 12px rgba(129, 140, 248, 0.8)' }}>Calculator</span>
-      </h2>
+      {/* <h2 className="text-3xl font-mono font-bold text-white mb-6 text-center"> */}
+        {/* <span className="text-indigo-400 drop-shadow-lg" style={{ textShadow: '0 0 12px rgba(129, 140, 248, 0.8)' }}>calculator</span> */}
+      {/* </h2> */}
       
       {isLoading ? (
         <div className="flex justify-center items-center h-40">

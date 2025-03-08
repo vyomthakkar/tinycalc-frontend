@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, Code, Terminal, ChevronRight } from 'lucide-react';
 
-const Header = () => {
-  const [activeTab, setActiveTab] = useState('calculator');
+const Header = ({ activeTab, setActiveTab }) => {
   const [hovering, setHovering] = useState(false);
 
   return (

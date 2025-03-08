@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Shader = () => {
-    const [input, setInput] = useState('Create a simple shader that pulses with red color');
+    const [input, setInput] = useState('A rotating cube with a gradient background');
     const [shaderCode, setShaderCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -451,7 +453,65 @@ void main() {
             render();
             
             // Additional cleanup
-            return () => {
+            // Function to add syntax highlighting to GLSL code
+    const highlightGLSL = (code) => {
+        if (!code) return '';
+        
+        // Define regex patterns for different syntax elements
+        const patterns = [
+            // Comments
+            { regex: /\/\/.*?(?=\n|$)/g, className: 'text-gray-500' },
+            { regex: /\/\*[\s\S]*?\*\//g, className: 'text-gray-500' },
+            
+            // Keywords
+            { regex: /\b(attribute|const|uniform|varying|buffer|shared|coherent|volatile|restrict|readonly|writeonly|layout|centroid|flat|smooth|noperspective|patch|sample|break|continue|do|for|while|if|else|switch|case|default|in|out|inout|true|false|invariant|precise|discard|return|void|struct|precision|highp|mediump|lowp)\b/g, 
+              className: 'text-purple-400' },
+            
+            // Types
+            { regex: /\b(float|int|uint|bool|vec2|vec3|vec4|mat2|mat3|mat4|mat2x2|mat2x3|mat2x4|mat3x2|mat3x3|mat3x4|mat4x2|mat4x3|mat4x4|sampler[123]D|samplerCube|sampler2DRect|sampler2DRectShadow|sampler2DShadow|samplerCubeShadow|sampler[12]DArray|sampler[12]DArrayShadow|isampler[123]D|image[123]D)\b/g, 
+              className: 'text-blue-400' },
+            
+            // Special variables and functions
+            { regex: /\b(gl_Position|gl_PointSize|gl_ClipVertex|gl_FragCoord|gl_FrontFacing|gl_FragColor|gl_FragData|gl_FragDepth|outColor|main)\b/g, 
+              className: 'text-yellow-300' },
+            
+            // Built-in functions
+            { regex: /\b(sin|cos|tan|asin|acos|atan|radians|degrees|pow|exp|log|exp2|log2|sqrt|inversesqrt|abs|sign|floor|ceil|fract|mod|min|max|clamp|mix|step|smoothstep|length|distance|dot|cross|normalize|reflect|refract|texture2D|textureCube)\b/g, 
+              className: 'text-green-400' },
+            
+            // Numbers
+            { regex: /\b(-?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)\b/g, 
+              className: 'text-indigo-300' },
+            
+            // Uniforms (custom naming pattern)
+            { regex: /\b(u_[a-zA-Z0-9_]+)\b/g, 
+              className: 'text-red-400' },
+            
+            // Preprocessor directives
+            { regex: /(#version|#ifdef|#ifndef|#if|#else|#elif|#endif|#extension|#pragma|#define|#undef|#include)( .*)?(?=\n|$)/g, 
+              className: 'text-pink-400' }
+        ];
+        
+        // Apply all patterns to create an HTML string with syntax highlighting
+        let highlightedCode = code;
+        
+        // Replace < and > with their HTML entities to avoid breaking HTML
+        highlightedCode = highlightedCode.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        
+        // Apply each pattern
+        patterns.forEach(({ regex, className }) => {
+            highlightedCode = highlightedCode.replace(regex, match => 
+                `<span class="${className}">${match}</span>`
+            );
+        });
+        
+        // Handle line breaks and preserve them
+        highlightedCode = highlightedCode.replace(/\n/g, '<br />');
+        
+        return highlightedCode;
+    };
+
+    return () => {
                 if (animationRef.current) {
                     cancelAnimationFrame(animationRef.current);
                 }
@@ -503,7 +563,7 @@ uniform float u_time;
 uniform vec2 u_resolution;
 
 void main() {
-    gl_Position = a_position;
+  gl_Position = a_position;  // DO NOT CHANGE THIS LINE
 }
 
 // Fragment Shader
@@ -515,17 +575,33 @@ uniform float u_time;
 uniform vec2 u_resolution;
 
 void main() {
-    // Simple color pulse effect
-    float pulse = abs(sin(u_time));
-    
-    // Create a gradient based on position
-    vec2 st = gl_FragCoord.xy / u_resolution.xy;
-    vec3 color = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), st.x);
-    
-    // Apply the pulse effect
-    color = color * pulse;
-    
-    outColor = vec4(color, 1.0);
+  vec2 st = gl_FragCoord.xy / u_resolution;
+  vec3 color = vec3(0.0);
+  
+  // Gradient background
+  color = vec3(st.x, st.y, 1.0 - st.y);
+  
+  // Simulate a rotating cube effect
+  float angle = u_time;
+  float c = cos(angle);
+  float s = sin(angle);
+  
+  // Center the coordinates
+  vec2 center = st - 0.5;
+  
+  // Rotate the coordinates
+  vec2 rotated = vec2(
+    center.x * c - center.y * s,
+    center.x * s + center.y * c
+  );
+  
+  // Define a simple cube-like shape
+  float cubeSize = 0.2;
+  if (abs(rotated.x) < cubeSize && abs(rotated.y) < cubeSize) {
+    color = vec3(1.0, 0.5, 0.0); // Orange color for the cube
+  }
+  
+  outColor = vec4(color, 1.0);
 }`);
         }
     }, []);
@@ -536,40 +612,23 @@ void main() {
                 <span className="text-indigo-400" style={{ textShadow: '0 0 15px rgba(129, 140, 248, 0.9)' }}>Shader Generator</span>
             </h2>
             
-            {/* API Status Check */}
-            <div className="mb-6 flex items-center">
-                <button 
-                    onClick={checkApiStatus}
-                    className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded mr-4 transition-colors duration-150 border border-gray-700"
-                >
-                    Check API Status
-                </button>
-                
-                {apiStatus && (
-                    <span className="text-gray-300 font-mono">
-                        API Status: <span className={apiStatus.status === 'ok' ? 'text-green-400' : 'text-red-400'}>
-                            {apiStatus.status}
-                        </span>
-                    </span>
-                )}
-            </div>
-            
-            {/* Input Field */}
-            <div className="mb-6">
+            {/* Input Section - Cleaner version */}
+            <div className="mb-4">
                 <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    className="w-full h-32 bg-gray-800 text-white font-mono px-4 py-3 rounded border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors duration-200 resize-y"
+                    className="w-full bg-gray-950 text-indigo-100 font-mono p-4 rounded border border-gray-800 focus:border-indigo-500 focus:outline-none resize-none h-24"
                     placeholder="Describe the shader you want to generate..."
+                    style={{ caretColor: '#8B5CF6' }}
                 />
             </div>
             
-            {/* Generate Button */}
+            {/* Generate Button - More compact */}
             <div className="mb-6">
                 <button
                     onClick={generateShader}
                     disabled={loading || !input.trim()}
-                    className={`px-6 py-3 rounded font-medium flex items-center justify-center transition-colors duration-200 w-full sm:w-auto ${
+                    className={`px-6 py-2 rounded-md font-mono flex items-center justify-center transition-all duration-200 max-w-xs mx-auto ${
                         loading || !input.trim() 
                             ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
                             : 'bg-indigo-600 hover:bg-indigo-700 text-white'
@@ -577,55 +636,103 @@ void main() {
                 >
                     {loading ? (
                         <>
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Generating...
+                            <div className="flex items-center">
+                                <div className="w-4 h-4 border-2 border-indigo-100 border-t-transparent rounded-full animate-spin mr-2"></div>
+                                <span>Generating...</span>
+                            </div>
                         </>
-                    ) : 'Generate Shader'}
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Run Shader
+                        </>
+                    )}
                 </button>
             </div>
             
             {/* Error Message */}
             {error && (
-                <div className="mb-6 p-4 bg-red-900/30 border border-red-600 rounded-md text-red-200 font-mono">
-                    {error}
+                <div className="mb-6 bg-red-900/30 border-l-4 border-red-600 rounded-md overflow-hidden">
+                    <div className="flex items-center p-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div className="text-red-200 font-mono">
+                            {error}
+                        </div>
+                    </div>
                 </div>
             )}
             
             {/* WebGL Render Error */}
             {renderError && (
-                <div className="mb-6 p-4 bg-yellow-900/30 border border-yellow-600 rounded-md text-yellow-200 font-mono">
-                    <pre className="whitespace-pre-wrap text-sm">{renderError}</pre>
-                </div>
-            )}
-            
-            {/* Shader Preview */}
-            {shaderCode && (
-                <div className="mb-6">
-                    <h3 className="text-lg font-mono text-indigo-400 mb-3" style={{ textShadow: '0 0 5px rgba(129, 140, 248, 0.5)' }}>
-                        Shader Preview:
-                    </h3>
-                    <div className="border border-gray-700 rounded-lg overflow-hidden bg-black">
-                        <canvas 
-                            ref={canvasRef}
-                            className="w-full h-64 md:h-80"
-                        />
+                <div className="mb-6 bg-yellow-900/30 border-l-4 border-yellow-600 rounded-md overflow-hidden">
+                    <div className="p-4">
+                        <div className="flex items-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-yellow-300 font-mono">Shader Compilation Error</span>
+                        </div>
+                        <pre className="whitespace-pre-wrap text-sm text-yellow-200 font-mono pl-9">{renderError}</pre>
                     </div>
                 </div>
             )}
             
-            {/* Shader Code Output */}
+                            {/* Preview and Code Sections (shown when shader code exists) */}
             {shaderCode && (
-                <div>
-                    <h3 className="text-lg font-mono text-indigo-400 mb-3" style={{ textShadow: '0 0 5px rgba(129, 140, 248, 0.5)' }}>
-                        Generated Shader Code:
-                    </h3>
-                    <div className="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
-                        <pre className="p-4 text-gray-300 text-sm font-mono overflow-x-auto">
-                            {shaderCode}
-                        </pre>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Shader Preview */}
+                    <div className="bg-gray-950 rounded-lg border border-gray-800 shadow-lg overflow-hidden">
+                        <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700">
+                            <span className="text-indigo-300 font-mono text-sm">Shader Preview</span>
+                            <div className="flex space-x-2">
+                                <span className="text-xs bg-indigo-900/50 text-indigo-300 px-2 py-0.5 rounded font-mono">WebGL</span>
+                                <span className="text-xs bg-green-900/50 text-green-300 px-2 py-0.5 rounded font-mono">Live</span>
+                            </div>
+                        </div>
+                        
+                        <div className="relative">
+                            <canvas 
+                                ref={canvasRef}
+                                className="w-full h-64"
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2 py-1 bg-black/50 text-gray-300 text-xs font-mono">
+                                <span>Fragment time: <span className="text-green-400">30 FPS</span></span>
+                                <span>Resolution: <span className="text-indigo-400">Canvas</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Shader Code Output */}
+                    <div className="bg-gray-950 rounded-lg border border-gray-800 shadow-lg overflow-hidden">
+                        <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700">
+                            <span className="text-indigo-300 font-mono text-sm">Generated Code</span>
+                            <div className="flex space-x-2">
+                                <button className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-0.5 rounded font-mono transition-colors">
+                                    Copy
+                                </button>
+                                <span className="text-xs bg-purple-900/50 text-purple-300 px-2 py-0.5 rounded font-mono">GLSL</span>
+                            </div>
+                        </div>
+                        
+                        <div className="h-64 overflow-auto">
+                            <SyntaxHighlighter 
+                                language="glsl" 
+                                style={vscDarkPlus}
+                                customStyle={{
+                                    margin: 0,
+                                    padding: '1rem',
+                                    background: 'transparent',
+                                    fontSize: '0.875rem',
+                                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+                                }}
+                            >
+                                {shaderCode}
+                            </SyntaxHighlighter>
+                        </div>
                     </div>
                 </div>
             )}

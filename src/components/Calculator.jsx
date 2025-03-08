@@ -185,7 +185,7 @@ const Calculator = () => {
               </button>
             ))}
             
-            {['0', '.', '=', '+'].map((btn) => (
+            {['0', '00', '=', '+'].map((btn) => (
               <button
                 key={btn}
                 className={`${btn === '+' || btn === '=' ? 'bg-indigo-700 hover:bg-indigo-600 active:bg-indigo-800 border-indigo-600' : 'bg-gray-800 hover:bg-gray-700 active:bg-gray-900 border-gray-700'} text-white rounded p-2 text-center font-mono text-lg transition-all duration-150 shadow-md active:shadow-inner border active:translate-y-0.5`}

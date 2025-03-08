@@ -19,6 +19,18 @@ dist-ssr
 Cargo.lock  # You may want to keep this for binary projects
 /pkg/       # WebAssembly package output directory
 
+# wasm-pack build output
+/pkg/
+/target/
+/wasm-pack.log
+/Cargo.lock
+/.cargo-ok
+
+# Generated makefiles and other build artifacts
+**/*.mk
+**/Makefile
+**/*.d
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

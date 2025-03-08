@@ -32,7 +32,6 @@ const Shader = () => {
         
         try {
             const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/generate', {
-            // const response = await fetch('http://localhost:4000/api/shader/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,6 +55,7 @@ const Shader = () => {
 
     // Enhanced shader parser that handles different formats and strips markdown
     const parseShaderCode = (code) => {
+        // ... [code parsing logic - unchanged] ...
         if (!code) return { vertexShader: '', fragmentShader: '' };
         
         // First, strip any markdown code fences
@@ -151,6 +151,7 @@ const Shader = () => {
     
     // Ensure shader has proper GLSL version and required declarations
     const ensureGlslVersion = (shader, isFragment = false) => {
+        // ... [shader version logic - unchanged] ...
         if (!shader) return '';
         
         // Remove any trailing backticks or code fences that might have been missed
@@ -220,6 +221,7 @@ ${shader}`;
 
     // Initialize and compile WebGL shaders whenever shaderCode changes
     useEffect(() => {
+        // ... [WebGL initialization and rendering - unchanged] ...
         if (!shaderCode || !canvasRef.current) return;
         
         // Clean up previous WebGL context if it exists
@@ -529,120 +531,102 @@ void main() {
     }, []);
 
     return (
-        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <h1>Shader Generator</h1>
+        <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-xl mt-6 border border-gray-800">
+            <h2 className="text-4xl font-mono font-bold text-white mb-6 text-center">
+                <span className="text-indigo-400" style={{ textShadow: '0 0 15px rgba(129, 140, 248, 0.9)' }}>Shader Generator</span>
+            </h2>
             
             {/* API Status Check */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-6 flex items-center">
                 <button 
                     onClick={checkApiStatus}
-                    style={{ 
-                        padding: '8px 16px', 
-                        backgroundColor: '#eee', 
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        marginRight: '10px'
-                    }}
+                    className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded mr-4 transition-colors duration-150 border border-gray-700"
                 >
                     Check API Status
                 </button>
                 
                 {apiStatus && (
-                    <span>
-                        API Status: <strong>{apiStatus.status}</strong>
+                    <span className="text-gray-300 font-mono">
+                        API Status: <span className={apiStatus.status === 'ok' ? 'text-green-400' : 'text-red-400'}>
+                            {apiStatus.status}
+                        </span>
                     </span>
                 )}
             </div>
             
             {/* Input Field */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-6">
                 <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    style={{ 
-                        width: '100%', 
-                        height: '100px', 
-                        padding: '8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc' 
-                    }}
+                    className="w-full h-32 bg-gray-800 text-white font-mono px-4 py-3 rounded border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors duration-200 resize-y"
                     placeholder="Describe the shader you want to generate..."
                 />
             </div>
             
             {/* Generate Button */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-6">
                 <button
                     onClick={generateShader}
                     disabled={loading || !input.trim()}
-                    style={{ 
-                        padding: '10px 20px', 
-                        backgroundColor: loading ? '#ccc' : '#007bff', 
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: loading ? 'not-allowed' : 'pointer'
-                    }}
+                    className={`px-6 py-3 rounded font-medium flex items-center justify-center transition-colors duration-200 w-full sm:w-auto ${
+                        loading || !input.trim() 
+                            ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
+                            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }`}
                 >
-                    {loading ? 'Generating...' : 'Generate Shader'}
+                    {loading ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Generating...
+                        </>
+                    ) : 'Generate Shader'}
                 </button>
             </div>
             
             {/* Error Message */}
             {error && (
-                <div style={{ 
-                    padding: '10px', 
-                    backgroundColor: '#f8d7da', 
-                    color: '#721c24',
-                    borderRadius: '4px',
-                    marginBottom: '20px'
-                }}>
+                <div className="mb-6 p-4 bg-red-900/30 border border-red-600 rounded-md text-red-200 font-mono">
                     {error}
                 </div>
             )}
             
             {/* WebGL Render Error */}
             {renderError && (
-                <div style={{ 
-                    padding: '10px', 
-                    backgroundColor: '#fff3cd', 
-                    color: '#856404',
-                    borderRadius: '4px',
-                    marginBottom: '20px'
-                }}>
-                    <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{renderError}</pre>
+                <div className="mb-6 p-4 bg-yellow-900/30 border border-yellow-600 rounded-md text-yellow-200 font-mono">
+                    <pre className="whitespace-pre-wrap text-sm">{renderError}</pre>
                 </div>
             )}
             
             {/* Shader Preview */}
             {shaderCode && (
-                <div style={{ marginBottom: '20px' }}>
-                    <h3>Shader Preview:</h3>
-                    <canvas 
-                        ref={canvasRef}
-                        style={{ 
-                            width: '100%', 
-                            height: '300px', 
-                            backgroundColor: '#000',
-                            borderRadius: '4px'
-                        }}
-                    />
+                <div className="mb-6">
+                    <h3 className="text-lg font-mono text-indigo-400 mb-3" style={{ textShadow: '0 0 5px rgba(129, 140, 248, 0.5)' }}>
+                        Shader Preview:
+                    </h3>
+                    <div className="border border-gray-700 rounded-lg overflow-hidden bg-black">
+                        <canvas 
+                            ref={canvasRef}
+                            className="w-full h-64 md:h-80"
+                        />
+                    </div>
                 </div>
             )}
             
             {/* Shader Code Output */}
             {shaderCode && (
                 <div>
-                    <h3>Generated Shader Code:</h3>
-                    <pre style={{ 
-                        backgroundColor: '#f5f5f5', 
-                        padding: '15px',
-                        borderRadius: '4px',
-                        overflowX: 'auto',
-                        border: '1px solid #ccc'
-                    }}>
-                        {shaderCode}
-                    </pre>
+                    <h3 className="text-lg font-mono text-indigo-400 mb-3" style={{ textShadow: '0 0 5px rgba(129, 140, 248, 0.5)' }}>
+                        Generated Shader Code:
+                    </h3>
+                    <div className="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
+                        <pre className="p-4 text-gray-300 text-sm font-mono overflow-x-auto">
+                            {shaderCode}
+                        </pre>
+                    </div>
                 </div>
             )}
         </div>

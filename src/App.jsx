@@ -3,11 +3,11 @@ import Calculator from './components/Calculator'
 import Header from './components/Header'
 function App() {
   return (
-    <div className="app">
+    <div className="app bg-gray-950 min-h-screen">
       <header>
         <Header />
       </header>
-      <main>
+      <main className='container mx-auto py-8'>
         <Calculator />
       </main>
       <footer>

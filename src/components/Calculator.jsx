@@ -170,6 +170,9 @@ const Calculator = () => {
           </div>
         </>
       )}
+
+
+
       
       {/* Add keyframes for loading animations */}
       <style jsx>{`
@@ -187,3 +190,4 @@ const Calculator = () => {
 };
 
 export default Calculator;
+

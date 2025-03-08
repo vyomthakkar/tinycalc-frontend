@@ -1,5 +1,5 @@
 {
-    "buildCommand": "npm run build",
-    "installCommand": "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh && npm install",
-    "outputDirectory": "dist"
-  }
+  "buildCommand": "vite build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist"
+}

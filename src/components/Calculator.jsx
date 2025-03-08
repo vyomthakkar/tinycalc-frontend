@@ -62,7 +62,7 @@ const Calculator = () => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg mt-6">
       <h2 className="text-3xl font-mono font-bold text-white mb-6 text-center">
-        Rust<span className="text-indigo-400">WASM</span> Calculator
+        <span className="text-indigo-400">Calculator</span>
       </h2>
       
       {isLoading ? (
@@ -106,16 +106,16 @@ const Calculator = () => {
 
           {error ? (
             <div className="max-w-md mx-auto bg-red-900/30 border border-red-600 rounded-md mb-6 transition-all duration-300 overflow-hidden">
-              <div className="flex flex-col items-center p-4">
-                <span className="text-red-300 font-mono mb-1">Error:</span>
-                <div className="text-red-200 text-xl font-mono text-center py-1">{error}</div>
+              <div className="flex flex-col items-center py-2 px-0.5">
+                <span className="text-red-300 font-mono mb-0.2">Error:</span>
+                <div className="text-red-200 font-mono text-center py-0.5">{error}</div>
               </div>
             </div>
           ) : result !== '' ? (
             <div className="max-w-xs mx-auto bg-indigo-900/30 border border-indigo-600 rounded-md mb-6 transition-all duration-300 overflow-hidden">
-              <div className="flex flex-col items-center p-4">
+              <div className="flex flex-col items-center py-2 px-0.5">
                 <span className="text-indigo-300 font-mono mb-1">Result:</span>
-                <div className="text-white text-xl font-mono font-bold text-center py-1">{result}</div>
+                <div className="text-white text-xl font-mono font-bold text-center py-0.5">{result}</div>
               </div>
             </div>
           ) : null}

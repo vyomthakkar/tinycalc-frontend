@@ -29,7 +29,7 @@ const Shader = () => {
             });
     };
 
-    // Generate shader code
+    // Generate shader code (API call to elixir backend)
     const generateShader = async () => {
         setLoading(true);
         setError(null);
@@ -598,10 +598,6 @@ void main() {
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-xl mt-6 border border-gray-800">
-            {/* <h2 className="text-4xl font-mono font-bold text-white mb-6 text-center">
-                <span className="text-indigo-400" style={{ textShadow: '0 0 15px rgba(129, 140, 248, 0.9)' }}>Shader Generator</span>
-            </h2> */}
-            
             {/* Input Section - Cleaner version */}
             <div className="mb-4">
                 <textarea

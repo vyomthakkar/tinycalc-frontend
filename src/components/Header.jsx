@@ -129,7 +129,7 @@ const Header = ({ activeTab, setActiveTab }) => {
           </div>
           
           {/* Mode Selection Tabs */}
-          <div className="mt-8 pt-2 border-t border-gray-700 flex flex-col items-center">
+          <div className="mt-3 pt-2 flex flex-col items-center">
             <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
               <button
                 onClick={() => setActiveTab('calculator')}

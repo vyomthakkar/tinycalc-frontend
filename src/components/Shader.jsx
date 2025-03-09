@@ -10,9 +10,9 @@ const Shader = () => {
     const [renderError, setRenderError] = useState('');
     const [copied, setCopied] = useState(false);
     const [lastErrorInput, setLastErrorInput] = useState(''); // Store input that caused error, will be sent to the API to correct the shader code
-    const [retrying, setRetrying] = useState(false); // Track if we're in retry mode
+    const [retrying, setRetrying] = useState(false); // Track if in retry mode
 
-    // Add this to your state variables
+    // sample prompts
     const [samplePrompts] = useState([
         "A rotating cube with a gradient background",
         "Colorful plasma effect with moving waves",
@@ -105,10 +105,9 @@ const Shader = () => {
 
     // Enhanced shader parser that handles different formats and strips markdown
     const parseShaderCode = (code) => {
-        // ... [code parsing logic - unchanged] ...
         if (!code) return { vertexShader: '', fragmentShader: '' };
         
-        // First, strip any markdown code fences
+        // strip unwanted markdown 
         code = code.replace(/```(?:glsl|c|cpp)?\n?/g, '');  // Remove opening code fences with optional language
         code = code.replace(/```\n?/g, '');  // Remove closing code fences
         code = code.replace(/`([^`]+)`/g, '$1');  // Remove inline code backticks
@@ -271,7 +270,6 @@ ${shader}`;
 
     // Initialize and compile WebGL shaders whenever shaderCode changes
     useEffect(() => {
-        // ... [WebGL initialization and rendering - unchanged] ...
         if (!shaderCode || !canvasRef.current) return;
         
         // Clean up previous WebGL context if it exists
@@ -488,64 +486,7 @@ ${shader}`;
             
             render();
             
-            // Additional cleanup
-            // Function to add syntax highlighting to GLSL code
-    const highlightGLSL = (code) => {
-        if (!code) return '';
-        
-        // Define regex patterns for different syntax elements
-        const patterns = [
-            // Comments
-            { regex: /\/\/.*?(?=\n|$)/g, className: 'text-gray-500' },
-            { regex: /\/\*[\s\S]*?\*\//g, className: 'text-gray-500' },
-            
-            // Keywords
-            { regex: /\b(attribute|const|uniform|varying|buffer|shared|coherent|volatile|restrict|readonly|writeonly|layout|centroid|flat|smooth|noperspective|patch|sample|break|continue|do|for|while|if|else|switch|case|default|in|out|inout|true|false|invariant|precise|discard|return|void|struct|precision|highp|mediump|lowp)\b/g, 
-              className: 'text-purple-400' },
-            
-            // Types
-            { regex: /\b(float|int|uint|bool|vec2|vec3|vec4|mat2|mat3|mat4|mat2x2|mat2x3|mat2x4|mat3x2|mat3x3|mat3x4|mat4x2|mat4x3|mat4x4|sampler[123]D|samplerCube|sampler2DRect|sampler2DRectShadow|sampler2DShadow|samplerCubeShadow|sampler[12]DArray|sampler[12]DArrayShadow|isampler[123]D|image[123]D)\b/g, 
-              className: 'text-blue-400' },
-            
-            // Special variables and functions
-            { regex: /\b(gl_Position|gl_PointSize|gl_ClipVertex|gl_FragCoord|gl_FrontFacing|gl_FragColor|gl_FragData|gl_FragDepth|outColor|main)\b/g, 
-              className: 'text-yellow-300' },
-            
-            // Built-in functions
-            { regex: /\b(sin|cos|tan|asin|acos|atan|radians|degrees|pow|exp|log|exp2|log2|sqrt|inversesqrt|abs|sign|floor|ceil|fract|mod|min|max|clamp|mix|step|smoothstep|length|distance|dot|cross|normalize|reflect|refract|texture2D|textureCube)\b/g, 
-              className: 'text-green-400' },
-            
-            // Numbers
-            { regex: /\b(-?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)\b/g, 
-              className: 'text-indigo-300' },
-            
-            // Uniforms (custom naming pattern)
-            { regex: /\b(u_[a-zA-Z0-9_]+)\b/g, 
-              className: 'text-red-400' },
-            
-            // Preprocessor directives
-            { regex: /(#version|#ifdef|#ifndef|#if|#else|#elif|#endif|#extension|#pragma|#define|#undef|#include)( .*)?(?=\n|$)/g, 
-              className: 'text-pink-400' }
-        ];
-        
-        // Apply all patterns to create an HTML string with syntax highlighting
-        let highlightedCode = code;
-        
-        // Replace < and > with their HTML entities to avoid breaking HTML
-        highlightedCode = highlightedCode.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        
-        // Apply each pattern
-        patterns.forEach(({ regex, className }) => {
-            highlightedCode = highlightedCode.replace(regex, match => 
-                `<span class="${className}">${match}</span>`
-            );
-        });
-        
-        // Handle line breaks and preserve them
-        highlightedCode = highlightedCode.replace(/\n/g, '<br />');
-        
-        return highlightedCode;
-    };
+
 
     return () => {
                 if (animationRef.current) {
@@ -675,7 +616,7 @@ void main() {
                 />
             </div>
             
-            {/* Generate Button - More compact */}
+            {/* Generate Button */}
             <div className="mb-6">
                 <button
                     onClick={generateShader}

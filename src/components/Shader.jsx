@@ -7,9 +7,10 @@ const Shader = () => {
     const [shaderCode, setShaderCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [apiStatus, setApiStatus] = useState(null);
     const [renderError, setRenderError] = useState('');
     const [copied, setCopied] = useState(false);
+    const [lastErrorInput, setLastErrorInput] = useState(''); // Store input that caused error
+    const [retrying, setRetrying] = useState(false); // Track if we're in retry mode
     
     // Reference to canvas element
     const canvasRef = useRef(null);
@@ -29,13 +30,16 @@ const Shader = () => {
             });
     };
 
-    // Generate shader code (API call to elixir backend)
+    // Generate shader code
     const generateShader = async () => {
         setLoading(true);
         setError(null);
+        setRenderError('');
+        setRetrying(false);
         
         try {
-            const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/generate', {
+            // const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/generate', {
+            const response = await fetch('http://localhost:4000/api/shader/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,6 +58,41 @@ const Shader = () => {
             setError('Error connecting to the API: ' + err.message);
         } finally {
             setLoading(false);
+        }
+    };
+    
+    // Correct shader code when there was an error
+    const correctShader = async () => {
+        setLoading(true);
+        setRetrying(true);
+        
+        try {
+            // const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/correct', {
+            const response = await fetch('http://localhost:4000/api/shader/correct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    original_query: lastErrorInput,
+                    shader_code: shaderCode,
+                    error_message: renderError
+                }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                setShaderCode(data.shader_code);
+                setRenderError(''); // Clear error if correction succeeds
+            } else {
+                setError(data.message || 'Failed to correct shader code');
+            }
+        } catch (err) {
+            setError('Error connecting to the API: ' + err.message);
+        } finally {
+            setLoading(false);
+            setRetrying(false);
         }
     };
 
@@ -652,15 +691,36 @@ void main() {
                 </div>
             )}
             
-            {/* WebGL Render Error */}
+            {/* WebGL Render Error with Retry Button */}
             {renderError && (
                 <div className="mb-6 bg-yellow-900/30 border-l-4 border-yellow-600 rounded-md overflow-hidden">
                     <div className="p-4">
-                        <div className="flex items-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span className="text-yellow-300 font-mono">Shader Compilation Error</span>
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-yellow-300 font-mono">Shader Compilation Error</span>
+                            </div>
+                            <button 
+                                onClick={correctShader}
+                                disabled={loading}
+                                className={`text-sm ${loading ? 'bg-gray-700 text-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} px-3 py-1 rounded font-mono transition-colors duration-200 flex items-center`}
+                            >
+                                {loading && retrying ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-indigo-100 border-t-transparent rounded-full animate-spin mr-2"></div>
+                                        <span>Retrying...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Retry
+                                    </>
+                                )}
+                            </button>
                         </div>
                         <pre className="whitespace-pre-wrap text-sm text-yellow-200 font-mono pl-9">{renderError}</pre>
                     </div>

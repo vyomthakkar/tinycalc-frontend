@@ -7,6 +7,7 @@ const Calculator = () => {
   const [wasmModule, setWasmModule] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [inputFocused, setInputFocused] = useState(false);
+  const [justCalculated, setJustCalculated] = useState(false); // Track if we just performed a calculation
 
   // Load the WASM module
   useEffect(() => {
@@ -33,6 +34,7 @@ const Calculator = () => {
 
   const handleInputChange = (e) => {
     setExpression(e.target.value);
+    setJustCalculated(false); // Reset the flag when user manually types
   };
 
   const calculateResult = () => {
@@ -45,10 +47,12 @@ const Calculator = () => {
       const calculatedResult = wasmModule.calculate(expression);
       setResult(calculatedResult);
       setError('');
+      setJustCalculated(true); // Set this flag when calculation is successful
     } catch (err) {
       console.error('Calculation error:', err);
       setError(err.toString());
       setResult('');
+      setJustCalculated(false);
     }
   };
 
@@ -61,15 +65,31 @@ const Calculator = () => {
 
   // Function to append operation to expression
   const appendOperation = (op) => {
-    setExpression(prev => prev + op);
+    // If we've just calculated a result and the user enters an operator
+    if (justCalculated && result !== '' && ['+', '-', '*', '/'].includes(op)) {
+      setExpression(result + ' ' + op + ' '); // Add spaces for better readability
+      setJustCalculated(false); // Reset so we're back to normal input mode
+    } 
+    // If we've just calculated a result and user enters a number (or any non-operator)
+    else if (justCalculated && !['+', '-', '*', '/'].includes(op)) {
+      if (!isNaN(op) || op === '(' || op === ')') {
+        // For numbers or parentheses, start fresh
+        setExpression(op);
+        setResult(''); // Clear the result display
+      } else {
+        // For other characters, just append
+        setExpression(result + op);
+      }
+      setJustCalculated(false);
+    } 
+    // Normal operation (no recent calculation)
+    else {
+      setExpression(prev => prev + op);
+    }
   };
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl shadow-2xl mt-6 border-2 border-gray-800">
-      {/* <h2 className="text-3xl font-mono font-bold text-white mb-6 text-center"> */}
-        {/* <span className="text-indigo-400 drop-shadow-lg" style={{ textShadow: '0 0 12px rgba(129, 140, 248, 0.8)' }}>calculator</span> */}
-      {/* </h2> */}
-      
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-pulse flex flex-col items-center">
@@ -144,8 +164,11 @@ const Calculator = () => {
                 onClick={() => {
                   if (btn === 'C') {
                     setExpression('');
+                    setResult(''); // Also clear the result
+                    setJustCalculated(false);
                   } else if (btn === 'DEL') {
                     setExpression(prev => prev.slice(0, -1));
+                    setJustCalculated(false);
                   } else {
                     appendOperation(btn);
                   }
@@ -203,35 +226,55 @@ const Calculator = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
-                onClick={() => setExpression("2 + 3")}
+                onClick={() => {
+                  setExpression("2 + 3");
+                  setResult(''); // Clear the result
+                  setJustCalculated(false);
+                }}
               >
                 <div className="font-mono text-gray-400 text-sm">Add</div>
                 <code className="text-white">2 + 3</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
-                onClick={() => setExpression("5 - 2")}
+                onClick={() => {
+                  setExpression("5 - 2");
+                  setResult(''); // Clear the result
+                  setJustCalculated(false);
+                }}
               >
                 <div className="font-mono text-gray-400 text-sm">Subtract</div>
                 <code className="text-white">5 - 2</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
-                onClick={() => setExpression("4 * 3")}
+                onClick={() => {
+                  setExpression("4 * 3");
+                  setResult(''); // Clear the result
+                  setJustCalculated(false);
+                }}
               >
                 <div className="font-mono text-gray-400 text-sm">Multiply</div>
                 <code className="text-white">4 * 3</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer shadow-md hover:shadow-lg"
-                onClick={() => setExpression("10 / 2")}
+                onClick={() => {
+                  setExpression("10 / 2");
+                  setResult(''); // Clear the result
+                  setJustCalculated(false);
+                }}
               >
                 <div className="font-mono text-gray-400 text-sm">Divide</div>
                 <code className="text-white">10 / 2</code>
               </div>
               <div 
                 className="bg-gray-800 p-3 rounded border border-gray-700 hover:border-indigo-500 hover:bg-gray-750 transition-colors duration-200 cursor-pointer md:col-span-2 shadow-md hover:shadow-lg"
-                onClick={() => setExpression("(2 + 3) * 4")}
+                onClick={() => {
+                  setExpression("(2 + 3) * 4");
+                  setResult(''); // Clear the result
+                  setJustCalculated(false);
+                }}
               >
                 <div className="font-mono text-gray-400 text-sm">Parentheses / Composition</div>
                 <code className="text-white">(2 + 3) * 4</code>
@@ -266,4 +309,3 @@ const Calculator = () => {
 };
 
 export default Calculator;
-

@@ -9,7 +9,7 @@ const Shader = () => {
     const [error, setError] = useState(null);
     const [renderError, setRenderError] = useState('');
     const [copied, setCopied] = useState(false);
-    const [lastErrorInput, setLastErrorInput] = useState(''); // Store input that caused error
+    const [lastErrorInput, setLastErrorInput] = useState(''); // Store input that caused error, will be sent to the API to correct the shader code
     const [retrying, setRetrying] = useState(false); // Track if we're in retry mode
 
     // Add this to your state variables

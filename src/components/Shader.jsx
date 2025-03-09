@@ -9,6 +9,7 @@ const Shader = () => {
     const [error, setError] = useState(null);
     const [apiStatus, setApiStatus] = useState(null);
     const [renderError, setRenderError] = useState('');
+    const [copied, setCopied] = useState(false);
     
     // Reference to canvas element
     const canvasRef = useRef(null);
@@ -16,15 +17,16 @@ const Shader = () => {
     const programRef = useRef(null);
     const glRef = useRef(null);
 
-    // Check if API is online
-    const checkApiStatus = async () => {
-        try {
-            const response = await fetch('https://tinycalc-backend.fly.dev');
-            const data = await response.json();
-            setApiStatus(data);
-        } catch (err) {
-            setApiStatus({ status: 'error', message: 'API is not responding' });
-        }
+    // Function to copy code to clipboard
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(shaderCode)
+            .then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+            });
     };
 
     // Generate shader code
@@ -711,8 +713,18 @@ void main() {
                         <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700">
                             <span className="text-indigo-300 font-mono text-sm">Generated Code</span>
                             <div className="flex space-x-2">
-                                <button className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-0.5 rounded font-mono transition-colors">
-                                    Copy
+                                <button 
+                                    onClick={copyToClipboard}
+                                    className={`text-xs ${copied ? 'bg-green-700 text-green-100' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'} px-2 py-0.5 rounded font-mono transition-colors duration-200 flex items-center`}
+                                >
+                                    {copied ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Copied!
+                                        </>
+                                    ) : 'Copy'}
                                 </button>
                                 <span className="text-xs bg-purple-900/50 text-purple-300 px-2 py-0.5 rounded font-mono">GLSL</span>
                             </div>

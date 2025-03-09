@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Shader = () => {
-    const [input, setInput] = useState('A rotating cube with a gradient background');
+    const [input, setInput] = useState('Colorful plasma effect with moving waves');
     const [shaderCode, setShaderCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -14,8 +14,8 @@ const Shader = () => {
 
     // sample prompts
     const [samplePrompts] = useState([
-        "A rotating cube with a gradient background",
         "Colorful plasma effect with moving waves",
+        "A rotating cube with a gradient background",
         "Northern Lights (aurora borealis)",
     ]);
     
@@ -540,7 +540,7 @@ uniform float u_time;
 uniform vec2 u_resolution;
 
 void main() {
-  gl_Position = a_position;  // DO NOT CHANGE THIS LINE
+  gl_Position = a_position;  
 }
 
 // Fragment Shader
@@ -550,34 +550,23 @@ precision mediump float;
 out vec4 outColor;
 uniform float u_time;
 uniform vec2 u_resolution;
+uniform vec2 u_mouse;
 
 void main() {
   vec2 st = gl_FragCoord.xy / u_resolution;
   vec3 color = vec3(0.0);
-  
-  // Gradient background
-  color = vec3(st.x, st.y, 1.0 - st.y);
-  
-  // Simulate a rotating cube effect
-  float angle = u_time;
-  float c = cos(angle);
-  float s = sin(angle);
-  
-  // Center the coordinates
-  vec2 center = st - 0.5;
-  
-  // Rotate the coordinates
-  vec2 rotated = vec2(
-    center.x * c - center.y * s,
-    center.x * s + center.y * c
+
+  float x = st.x + sin((st.y + u_time * 0.1) * 10.0) * 0.1;
+  float y = st.y + cos((st.x + u_time * 0.1) * 10.0) * 0.1;
+
+  color = vec3(
+    sin(x * 5.0 + u_time),
+    sin(y * 5.0 + u_time * 1.3),
+    sin((x + y) * 5.0 + u_time * 1.7)
   );
-  
-  // Define a simple cube-like shape
-  float cubeSize = 0.2;
-  if (abs(rotated.x) < cubeSize && abs(rotated.y) < cubeSize) {
-    color = vec3(1.0, 0.5, 0.0); // Orange color for the cube
-  }
-  
+
+  color = (color + 1.0) / 2.0;
+
   outColor = vec4(color, 1.0);
 }`);
         }

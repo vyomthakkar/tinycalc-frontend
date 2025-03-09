@@ -19,7 +19,7 @@ const Header = ({ activeTab, setActiveTab }) => {
               <div className="relative w-12 h-12 flex items-center justify-center">
                 {/* Atom logo with orbiting electrons */}
                 <div className="relative w-full h-full">
-                  {/* Nucleus - fixed positioning */}
+                  {/* Nucleus  */}
                   <div 
                     className="absolute w-4 h-4 bg-indigo-500 rounded-full z-10"
                     style={{

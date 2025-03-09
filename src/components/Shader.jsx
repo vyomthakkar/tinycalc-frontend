@@ -38,8 +38,8 @@ const Shader = () => {
         setRetrying(false);
         
         try {
-            // const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/generate', {
-            const response = await fetch('http://localhost:4000/api/shader/generate', {
+            const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/generate', {
+            // const response = await fetch('http://localhost:4000/api/shader/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,8 +67,8 @@ const Shader = () => {
         setRetrying(true);
         
         try {
-            // const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/correct', {
-            const response = await fetch('http://localhost:4000/api/shader/correct', {
+            const response = await fetch('https://tinycalc-backend.fly.dev/api/shader/correct', {
+            // const response = await fetch('http://localhost:4000/api/shader/correct', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -11,6 +11,13 @@ const Shader = () => {
     const [copied, setCopied] = useState(false);
     const [lastErrorInput, setLastErrorInput] = useState(''); // Store input that caused error
     const [retrying, setRetrying] = useState(false); // Track if we're in retry mode
+
+    // Add this to your state variables
+    const [samplePrompts] = useState([
+        "A rotating cube with a gradient background",
+        "Colorful plasma effect with moving waves",
+        "Northern Lights (aurora borealis)",
+    ]);
     
     // Reference to canvas element
     const canvasRef = useRef(null);
@@ -637,7 +644,27 @@ void main() {
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-xl mt-6 border border-gray-800">
-            {/* Input Section - Cleaner version */}
+            {/* Sample Prompts Section */}
+            <div className="mb-6">
+                <div className="text-indigo-400 font-mono text-sm mb-2">Sample Prompts:</div>
+                <div className="flex flex-wrap gap-2">
+                    {samplePrompts.map((prompt, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setInput(prompt)}
+                        className={`py-1.5 px-3 rounded-full text-sm font-mono transition-colors duration-200 text-indigo-100 ${
+                        input === prompt 
+                            ? 'bg-indigo-600 hover:bg-indigo-700 border-transparent' 
+                            : 'bg-gray-800 hover:bg-gray-700 border border-gray-700'
+                        }`}
+                    >
+                        {prompt.length > 25 ? prompt.substring(0, 25) + "..." : prompt}
+                    </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Text Input Section */}
             <div className="mb-4">
                 <textarea
                     value={input}

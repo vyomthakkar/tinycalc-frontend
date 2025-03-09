@@ -11,6 +11,10 @@ pub fn evaluate_expression(expression: &str) -> Result<i32, String> {
     let mut i = 0;
     let chars: Vec<char> = expression.chars().collect();
 
+    // Flag to track if we're expecting a number or an operator
+    // True when we're expecting a number (at the start, after an operator, or after an opening parenthesis)
+    let mut expect_number = true;
+
     while i < chars.len() {
         let c = chars[i];
         
@@ -21,7 +25,6 @@ pub fn evaluate_expression(expression: &str) -> Result<i32, String> {
         }
         
         //parse numbers
-
         //detect the start of a number, accumulate all of the digits of the number, and then push the number to the numbers stack
         if c.is_digit(10) {
             let mut number = 0;
@@ -32,12 +35,14 @@ pub fn evaluate_expression(expression: &str) -> Result<i32, String> {
             }
 
             numbers.push(number);
+            expect_number = false; // After a number, we expect an operator
             continue;
         }
 
         //handle parentheses
         if c == '(' {
             operators.push(c);
+            expect_number = true; // After an opening parenthesis, we expect a number
         } else if c == ')' {
             while !operators.is_empty() && operators.last().unwrap() != &'(' { //applies all operators until the matching opening parenthesis is found, OR, the operators stack is empty
                 apply_operator(&mut numbers, &mut operators)?;
@@ -48,15 +53,26 @@ pub fn evaluate_expression(expression: &str) -> Result<i32, String> {
             }
 
             operators.pop(); //remove the matching opening parenthesis from the stack
+            expect_number = false; // After a closing parenthesis, we expect an operator
         } else if is_operator(c) {
-            //first process operators with higher precedence AND if current operator is not the first operator of an opening parenthesis (in which case it should be applied immediately), only then push the current operator to the stack
-            while !operators.is_empty() && 
-                  operators.last().unwrap() != &'(' && 
-                  precedence(operators.last().unwrap()) >= precedence(&c) {
-                apply_operator(&mut numbers, &mut operators)?;
-            }
+            // Handle unary minus (negative sign at the beginning or after another operator)
+            if c == '-' && expect_number {
+                // This is a unary minus
+                // Push 0 to the numbers stack so that we can subtract from it
+                numbers.push(0);
+                operators.push('-');
+            } else {
+                // This is a binary operator
+                //first process operators with higher precedence AND if current operator is not the first operator of an opening parenthesis (in which case it should be applied immediately), only then push the current operator to the stack
+                while !operators.is_empty() && 
+                    operators.last().unwrap() != &'(' && 
+                    precedence(operators.last().unwrap()) >= precedence(&c) {
+                    apply_operator(&mut numbers, &mut operators)?;
+                }
 
-            operators.push(c);
+                operators.push(c);
+            }
+            expect_number = true; // After any operator, we expect a number
         } else {
             return Err(format!("Invalid character: {}", c));
         }
@@ -168,6 +184,16 @@ mod tests {
     fn test_parentheses() {
         assert_eq!(evaluate_expression("(2 + 3) * 4").unwrap(), 20);
         assert_eq!(evaluate_expression("2 * (3 + 4)").unwrap(), 14);
+    }
+    
+    #[test]
+    fn test_negative_numbers() {
+        assert_eq!(evaluate_expression("-5").unwrap(), -5);
+        assert_eq!(evaluate_expression("-5 + 3").unwrap(), -2);
+        assert_eq!(evaluate_expression("5 + -3").unwrap(), 2);
+        assert_eq!(evaluate_expression("-5 * -3").unwrap(), 15);
+        assert_eq!(evaluate_expression("(-5)").unwrap(), -5);
+        assert_eq!(evaluate_expression("5 * (-3 + 1)").unwrap(), -10);
     }
     
     #[test]

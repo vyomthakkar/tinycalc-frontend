@@ -700,7 +700,7 @@ void main() {
                                 className="w-full h-64"
                             />
                             <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2 py-1 bg-black/50 text-gray-300 text-xs font-mono">
-                                <span>Fragment time: <span className="text-green-400">30 FPS</span></span>
+                                <span>Mode: <span className="text-green-400">Real-time</span></span>
                                 <span>Resolution: <span className="text-indigo-400">Canvas</span></span>
                             </div>
                         </div>

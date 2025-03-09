@@ -273,6 +273,12 @@ ${shader}`;
         // Parse the vertex and fragment shaders from the API response
         let { vertexShader, fragmentShader } = parseShaderCode(shaderCode);
         
+        // If we couldn't extract the shaders, display an error
+        if (!vertexShader || !fragmentShader) {
+            setRenderError('Failed to extract valid shader code. Please check your input and try again.');
+            return;
+        }
+        
         // Scan for unsupported matrix uniforms in vertex shader
         const matrixUniformPattern = /uniform\s+mat[234](?:x[234])?\s+(\w+)/g;
         let matrixMatch;
@@ -302,26 +308,8 @@ ${shader}`;
                 .replace(/outColor =/g, 'gl_FragColor =');
         }
         
-        // If we still couldn't extract the shaders, use defaults
-        const vertexShaderSource = vertexShader || `${isWebGL2 ? '#version 300 es' : ''}
-precision mediump float;
-
-${isWebGL2 ? 'in' : 'attribute'} vec4 a_position;
-
-void main() {
-    gl_Position = a_position;
-}`;
-        
-        const fragmentShaderSource = fragmentShader || `${isWebGL2 ? '#version 300 es' : ''}
-precision mediump float;
-
-${isWebGL2 ? 'out vec4 outColor;' : ''}
-uniform float u_time;
-
-void main() {
-    float pulse = abs(sin(u_time));
-    ${isWebGL2 ? 'outColor' : 'gl_FragColor'} = vec4(pulse, 0.0, 0.0, 1.0);
-}`;
+        const vertexShaderSource = vertexShader;
+        const fragmentShaderSource = fragmentShader;
         
         console.log("Vertex Shader:", vertexShaderSource);
         console.log("Fragment Shader:", fragmentShaderSource);
@@ -610,9 +598,9 @@ void main() {
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-xl mt-6 border border-gray-800">
-            <h2 className="text-4xl font-mono font-bold text-white mb-6 text-center">
+            {/* <h2 className="text-4xl font-mono font-bold text-white mb-6 text-center">
                 <span className="text-indigo-400" style={{ textShadow: '0 0 15px rgba(129, 140, 248, 0.9)' }}>Shader Generator</span>
-            </h2>
+            </h2> */}
             
             {/* Input Section - Cleaner version */}
             <div className="mb-4">
